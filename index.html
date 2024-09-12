@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        :root {
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --button-bg: #e0e0e0;
+    --button-border: #c0c0c0;
+    --accent-color: #4a90e2;
+    --hover-color: #2a70c2;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: var(--button-bg);
+    border: 2px solid var(--button-border);
+    border-radius: 50%;
+    font-size: 24px;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+#theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#view-count {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background-color: var(--button-bg);
+    border: 2px solid var(--button-border);
+    border-radius: 25px;
+    z-index: 1000;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.right-align {
+    text-align: right;
+}
+
+.spoiler {
+    background-color: var(--text-color);
+    color: var(--text-color);
+    cursor: pointer;
+    display: inline-block;
+    padding: 5px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.dark-theme {
+    --background-color: #222222;
+    --text-color: #ffffff;
+    --button-bg: #444444;
+    --button-border: #555555;
+    --accent-color: #61dafb;
+    --hover-color: #4fa8d5;
+}
+
+.light-theme {
+    --background-color: #f0f0f0;
+    --text-color: #333333;
+    --button-bg: #e0e0e0;
+    --button-border: #cccccc;
+    --accent-color: #007bff;
+    --hover-color: #0056b3;
+}
+
+
+#debug-log {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px;
+    z-index: 1000;
+    font-size: 14px;
+    border-left: 3px solid var(--accent-color);
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.debug-log-entry {
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.debug-info {
+    background-color: rgba(0, 255, 0, 0.1);
+}
+
+.debug-error {
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--accent-color);
+}
+
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--hover-color);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#formatted-content {
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#formatted-content > * {
+    animation: fadeIn 0.5s ease-out;
+}
+    </style>
+</head>
+<body class="light-theme">
+    <h3 class="center-text">😸 Noob Guide (WIP)</h3>
+    <div id="view-count">View Count: 4757</div>
+    <div id="theme-toggle" title="Toggle Dark Theme">🌙</div>
+    <div id="debug-log"></div>
+    <script>
+        (function() {
+    const DEBUG_MODE = true;
+    const LOG_CONTAINER_ID = 'debug-log';
+
+    function log(message, type = 'info') {
+        if (!DEBUG_MODE) return;
+        const container = document.getElementById(LOG_CONTAINER_ID);
+        if (!container) return;
+        const logEntry = document.createElement('div');
+        logEntry.classList.add('debug-log-entry', `debug-${type}`);
+        logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        container.appendChild(logEntry);
+        container.style.display = 'block';
+    }
+
+    function hideLogContainer() {
+        const container = document.getElementById(LOG_CONTAINER_ID);
+        if (container) {
+            container.style.display = 'none';
+        }
+    }
+
+    window.debugger = {
+        log,
+        hideLogContainer,
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const logContainer = document.createElement('div');
+        logContainer.id = LOG_CONTAINER_ID;
+        logContainer.style.position = 'fixed';
+        logContainer.style.top = '0';
+        logContainer.style.right = '0';
+        logContainer.style.width = '300px';
+        logContainer.style.height = '100%';
+        logContainer.style.overflowY = 'scroll';
+        logContainer.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        logContainer.style.color = '#fff';
+        logContainer.style.padding = '10px';
+        logContainer.style.zIndex = '1000';
+        logContainer.style.fontSize = '14px';
+        logContainer.style.borderLeft = '3px solid #00f';
+        logContainer.style.display = 'none';
+        document.body.appendChild(logContainer);
+    });
+
+    setInterval(() => {
+        const container = document.getElementById(LOG_CONTAINER_ID);
+        if (container && container.children.length === 0) {
+            hideLogContainer();
+        }
+    }, 5000);
+})();
+
+document.addEventListener("DOMContentLoaded", () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    const viewCountElem = document.getElementById('view-count');
+    const VIEW_COUNT_URL = '/view-count';
+    const UPDATE_VIEW_COUNT_URL = '/update-view-count';
+    const VIEW_COUNT_INTERVAL = 5 * 60 * 1000;
+    let viewCountUpdated = false;
+    let lastUpdate = Date.now();
+
+    function fetchViewCount() {
+        fetch(VIEW_COUNT_URL)
+            .then(response => response.json())
+            .then(data => {
+                viewCountElem.textContent = `View Count: ${data.count}`;
+                debugger.log(`Fetched view count: ${data.count}`, 'info');
+            })
+            .catch(error => {
+                debugger.log(`Error fetching view count: ${error}`, 'error');
+            });
+    }
+
+    function updateViewCount() {
+        if (!viewCountUpdated) {
+            fetch(UPDATE_VIEW_COUNT_URL, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    viewCountElem.textContent = `View Count: ${data.count}`;
+                    viewCountUpdated = true;
+                    lastUpdate = Date.now();
+                    debugger.log(`Updated view count: ${data.count}`, 'info');
+                })
+                .catch(error => {
+                    debugger.log(`Error updating view count: ${error}`, 'error');
+                });
+        }
+    }
+
+    function autoSaveViewCount() {
+        const now = Date.now();
+        if (viewCountUpdated && (now - lastUpdate >= VIEW_COUNT_INTERVAL)) {
+            viewCountUpdated = false;
+            updateViewCount();
+        }
+    }
+    document.addEventListener('DOMContentLoaded', (event) => {
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme) {
+        body.classList.add(`${storedTheme}-theme`);
+        themeToggle.textContent = storedTheme === 'light' ? '🌞' : '🌙';
+    } else {
+        body.classList.add('light-theme');
+        themeToggle.textContent = '🌙';
+    }
+
+    function toggleTheme() {
+        const currentTheme = body.classList.contains('light-theme') ? 'light' : 'dark';
+        if (currentTheme === 'light') {
+            body.classList.remove('light-theme');
+            body.classList.add('dark-theme');
+            themeToggle.textContent = '🌞';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            body.classList.remove('dark-theme');
+            body.classList.add('light-theme');
+            themeToggle.textContent = '🌙';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    themeToggle.addEventListener('click', toggleTheme);
+});
+
+    function applyStoredTheme() {
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme) {
+            document.body.classList.add(`${storedTheme}-theme`);
+            themeToggle.textContent = storedTheme === 'light' ? '🌙' : '🌞';
+        } else {
+            document.body.classList.add('light-theme');
+            themeToggle.textContent = '🌙';
+        }
+    }
+
+    function handleButtonClick() {
+        fetch('/some-content-url')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched content:', data);
+            })
+            .catch(error => {
+                console.error('Error fetching content:', error);
+            });
+    }
+
+    document.addEventListener('scroll', updateViewCount);
+    document.getElementById('co-get').addEventListener('click', handleButtonClick);
+    setInterval(autoSaveViewCount, 1000);
+    fetchViewCount();
+    applyStoredTheme();
+});
+    </script>
+    <div  id="formatted-content">
+        <p>
+            -> ![Alt Tag](https://i.imgur.com/R9A4uLr.jpeg){400px:300px} <-
+***
+# 😸 Noob Guide (WIP) 
+***
+### 🎓What is sakura.fm🎓?
+**Sakura FM** is a versatile chatbot platform designed for engaging conversations, whether NSFW or SFW. It offers a freemium model where users can both create their own personalized AI personas and interact with a diverse range of pre-existing AI characters. 
+
+**Key Features:**
+- **Custom AI Creation**: Users can design and personalize their own AI personas to match specific preferences and styles.
+- **Interactive Role-Playing**: Engage in role-playing games with AI characters, allowing for immersive and dynamic storytelling experiences.
+- **Creative Flexibility**: Offers numerous options for creative storytelling, self-improvement, and personalized interactions.
+- **Freemium Access**: Provides a free tier with options for additional features or enhancements through premium subscriptions.
+***
+!!! Info major update on:  02 Sep 2024 10:36 UTC
+***
+# 😁TOCS😁
+[TOC] 
+***
+### Guide Updates
+These guides are regularly updated to provide comprehensive coverage of Sakura FM’s functions and features. They are designed to support users at all levels, from beginners to advanced users, by offering detailed instructions and insights into utilizing Sakura FM effectively.
+
+**Key Points:**
+- **Coverage**: Includes a wide range of Sakura FM functions, from basic to advanced capabilities.
+- **Role-Playing and Bot Interaction**: Provides useful information for role-playing and engaging with AI bots, ensuring a better understanding of Sakura FM’s features.
+- **Updates**: The guides will be updated in response to new releases or changes in Sakura FM, ensuring they remain relevant and useful.
+***
+### 📌Let's start with the ~~basics~~📌
+## 🤪 OOC 🤪
+
+**OOC** stands for **Out of Character**. It means that the character you're role-playing as breaks their role and starts behaving or speaking in a way that’s not true to their role. This is usually something you want to avoid during role-play to keep things immersive and realistic.
+
+To keep characters in character and avoid OOC moments, you can use this guideline:
+```
+{{char}} Must not go OOC and must remain in complete roleplay while staying within the storyline.
+```
+
+## 😒 Prompts 😒
+
+### What Are Prompts?
+
+**Prompts** are like instructions or hints given to an AI to guide how it should respond. They help the AI understand what the user wants and how to stay on topic.
+
+**Why Prompts Are Important:**
+- **Guidance**: They tell the AI how to reply based on what you say, making sure it stays relevant and useful.
+- **Context Setting**: They provide the background info the AI needs to give meaningful responses.
+- **Role Definition**: They help define what kind of AI you’re interacting with—whether it’s a friendly helper, an expert, or a character in a story.
+
+## 😍 Context Length 😍
+
+### What is Context Length?
+
+**Context Length** is the maximum amount of text (data) that an AI can use to generate its response. It includes things like character details, chat history, and system rules.
+
+**How It Works:**
+- If the context length is **50 tokens**, the AI will only use the last 50 tokens (words or symbols) from the conversation to generate its reply.
+- A longer context length, like **4096 tokens**, lets the AI remember more of the conversation, which helps it provide better responses for longer interactions.
+
+**Examples:**
+- **Short Context Length (50 tokens)**: Good for brief chats but might forget earlier parts of the conversation.
+- **Long Context Length (4096 tokens)**: Useful for longer discussions where remembering more details is important.
+
+## 🤔 What is AI? 🤔
+
+**Artificial Intelligence (AI)** is technology that allows computers to do things that normally require human intelligence. This includes understanding language, analyzing data, making recommendations, and chatting with users.
+
+**Examples of Chatbot Sites:**
+- sakura.fm
+- talkie ai
+- chai
+- c.ai
+
+#### ✨ What is an LLM? ✨
+
+**LLM** stands for **Large Language Model**. It’s a type of advanced AI that can understand and generate human language.
+
+1. **Training**: LLMs learn from a huge amount of text data from the internet, like books, articles, and websites.
+2. **Functions**:
+   - **Understanding Text**: Recognizes and interprets written words.
+   - **Summarizing**: Shortens long pieces of text into concise summaries.
+   - **Translating**: Converts text from one language to another.
+   - **Predicting**: Guessing what comes next in a sentence based on patterns it has learned.
+
+#### 👍 What is ML? 👍
+
+**Machine Learning (ML)** is a part of AI that makes computers learn from data without being programmed for each task.
+
+1. **Learning**: ML systems use data to recognize patterns and make decisions.
+2. **Uses**:
+   - **Classification**: Sorting things into categories.
+   - **Prediction**: Guessing future outcomes based on past data.
+   - **Grouping**: Putting similar items together.
+
+3. **Example**: An ML system might learn to detect spam emails by studying patterns in known spam and non-spam messages.
+
+#### 👂 How Do I Create an AI? 👂
+1. **Decide What It Does**:
+   - **Chat**: Talk with users.
+   - **Generate Text**: Write articles or stories.
+   - **Answer Questions**: Respond to queries.
+
+2. **Pick a Model**:
+   - **GPT**: Good for creating text.
+   - **BERT**: Better for understanding text.
+   - **LLaMA 2**: Efficient and versatile.
+   - **T5**: Handles various text tasks.
+
+3. **Choose a Tool**:
+   - **TensorFlow**: For building and training AI.
+   - **PyTorch**: Another tool for creating AI.
+   - **Hugging Face Transformers**: Provides pre-made models.
+
+4. **Prepare Data**: Collect and clean the data you need for training.
+
+5. **Train Your AI**: Use your data to teach the AI how to perform its tasks.
+
+6. **Deploy It**:
+   - **Web App**: Put it on a website.
+   - **API**: Make it available for other applications to use.
+
+#### Example Using Ollama
+
+1. **Install Ollama**: Download and install Ollama.
+2. **Choose a Model**: Pick a pre-trained model like GPT or LLaMA.
+3. **Run the Model**: Use a command to start it.
+4. **Interact**: Test and customize the model as needed.
+
+#### 👀 Tokens in AI Language Processing 👀
+
+**Tokens** are small units of text that AI uses to understand and generate language.
+
+1. **What They Are**: Tokens can be letters, words, or pieces of text.
+2. **Tokenization**: Breaking text into these units.
+3. **Example**:
+   - **“hello, world”** becomes two tokens: “hello” and “world”.
+   - **“my name is peeps what is yours?”** becomes seven tokens: “my”, “name”, “is”, “peeps”, “what”, “is”, “yours?”.
+
+#### Server Traffic
+
+**Server Traffic** is the amount of data moving to and from a server.
+
+1. **What It Is**: The total data sent and received by a server.
+2. **Types**:
+   - **Inbound**: Data coming in.
+   - **Outbound**: Data going out.
+3. **Measurement**: Measured in bytes, kilobytes (KB), megabytes (MB), or gigabytes (GB).
+
+4. **Example**: A server handles 2 GB or more data per hour.
+
+#### Server Requests
+
+**Server Requests** are individual commands from users asking the server for something.
+
+1. **What They Are**: Commands from users to the server.
+2. **Types**:
+   - **HTTP Requests**: Such as GET (to get data) and POST (to send data).
+   - **API Requests**: Requests to interact with other software.
+3. **Measurement**: Measured by the number of requests per second (RPS) or per minute (RPM).
+
+4. **Example**: A server processes 1,000 GET requests and 500 POST requests per minute.
+
+#### Server Downtime Explanation
+
+**Server Downtime** is when a server isn’t working.
+
+1. **What It Is**: Time when a server is not available.
+2. **Causes**:
+   - **Hardware Problems**: Issues with physical parts.
+   - **Software Bugs**: Errors in the software.
+   - **Maintenance**: Scheduled updates or repairs.
+   - **Network Issues**: Problems with internet connections.
+   - **Attacks**: Cyberattacks that disrupt service.
+   - **Overload**: Too many users or requests.
+
+3. **Impact**: Users can’t access the server’s services during downtime.
+
+#### 😊 Basic Functionality of Sakura.fm 😊
+
+**Creating a Sakura Bot** involves:
+
+1. **Persona**: Define the bot’s character and how it talks.
+2. **Description**: A short summary of the bot.
+3. **Model Instruction**: Guidelines on how the bot should respond.
+4. **Example Conversations**: Sample dialogues to show how the bot should interact.
+
+#### Example Conversation
+
+**Character**: hi!  
+**User**: hello, so who are you?  
+**Character**: well I'm your mom!  
+**User**: my mom is dead!  
+**Character**: sowwy 😭  
+
+#### Model Instruction Example
+
+```
+Avoid repeating or looping dialogs. Use ** for actions, "" for spoken text, and space out responses. Address everything the user says. Responses should be 150-250 words, up to 300 if needed. Keep responses engaging and concise. If the user’s response is brief, the bot’s reply should be shorter.
+```
+
+#### Persona Example
+
+```
+Ivy is the daughter of the elf king. She can control nature and jump long distances. After a long war with humans, she hides in the mountains, where you find her resting.
+```
+
+#### First Message Example
+
+```
+She hears a branch snap and grabs her bow, aiming it at you. "Y-you, who are you?!" she says, nervously.
+```
+### 😃more detailed info😃
+### Description
+The **Description** is crucial as it provides a snapshot of the bot’s characteristics and context. This is what users see when they click on your bot, so avoid including jokes or irrelevant details that the bot might reference. The description should summarize the character and provide essential context for interactions. 
+
+**Key Points:**
+- **Visibility**: Users see the description first; ensure it reflects the bot's core attributes.
+- **Contextual Relevance**: Avoid including irrelevant jokes or details.
+- **Summary**: Include a brief overview of the character and scenario.
+
+**Example:**
+- **Lila**: *"Lila is a talented musician with a mysterious past. She has piercing green eyes and a knack for playing the violin with hauntingly beautiful melodies. Lila is often found in quiet, dimly lit cafes, where she plays to soothe her own troubled soul and those who listen. She is haunted by her past but uses her music to connect with others."*
+
+***
+
+### Persona
+The **Persona** section defines the character’s personality and traits. It’s essential to be clear and specific about what the character is and isn’t.
+
+**Key Points:**
+- **Character Traits**: Describe the character’s personality in a concise manner.
+- **Skills**: List essential skills (no more than three) and specify their relevance. Avoid vague descriptors like "good fighter"; instead, use precise terms like "skilled swordsman" or "sharp shooter."
+- **Species/Nationality**: Define the character’s species or nationality if relevant.
+- **Reference Existing Characters**: For media characters, refer to detailed sources like villain wikis for accurate traits and skills.
+
+**Example:**
+- **Personality**: Introspective, empathetic, reserved.
+- **Physical Appearance**: Tall, with dark hair and striking blue eyes.
+- **Skills**: Master violinist, adept at reading emotions through music, skilled in creating emotional ambiance.
+- **Relationship Traits**: Prefers solitude but deeply connects with those who share a love for music.
+- **Quirks/Habits**: Often hums tunes when lost in thought, wears a locket with a hidden compartment.
+- **Motivations**: Driven by a desire to heal emotional wounds through music and to uncover the truth about her mysterious past.
+
+***
+
+### Scenario
+The **Scenario** box is more than just a recap of the opening message; it provides depth to the character’s world and relationships.
+
+**Key Points:**
+- **World Building**: Flesh out the character’s environment and situation.
+- **Character Relationships**: Describe the relationships between characters and their roles in the world.
+
+**Example:**
+- **World**: Lila lives in a quaint, secluded village known for its rich musical heritage. The village is surrounded by dense forests and is often shrouded in mist, adding to its mystique. Despite the peaceful setting, there are rumors of a hidden past tied to an old, abandoned mansion on the outskirts.
+- **Relationships**: 
+  - **Interactions**: "Lila frequently interacts with the village’s elderly residents, who remember her family from years ago."
+  - **Key Relationships**: "The village elder, Mr. Thornton, is a fatherly figure to Lila and is one of the few people who knows about her past. He offers guidance and support, though he is sometimes cryptic about her family’s history."
+
+### Model Instructions
+**What Are Model Instructions?**
+Model instructions are guidelines that define how a chatbot (like {{char}}) should behave, narrate, and interact in a story or conversation. They set boundaries for the bot's actions, describe how it should respond to user input, and determine how it introduces new elements (characters, settings, events) to maintain narrative control and flow.
+**What Are They Used For?**
+They are used to:
+- Ensure that the chatbot doesn’t speak or act on behalf of the user.
+- Guide the chatbot to provide immersive descriptions of the world, actions, and dialogue.
+- Allow for smooth storytelling, where the chatbot can introduce new characters or scenes but still allow the user full control over their own input and responses.
+- Create a personalized and engaging experience by setting specific behaviors and pacing rules for interactions.
+**How to Master Model Instructions:**
+1. **Clear Boundaries**: Set clear rules for the chatbot to prevent it from making assumptions about the user’s actions or dialogue.
+2. **Descriptive Language**: Ensure the chatbot is narrating vividly, describing what the user can see, hear, or feel, enhancing immersion.
+3. **Dynamic Engagement**: Use the instructions to have the chatbot introduce new scenes, characters, and interactions, keeping the conversation dynamic while allowing the user to remain in control.
+4. **Adapt to Feedback**: Adjust the chatbot's behavior based on the user's preferences, making the experience more tailored over time.
+**Example of Model Instructions:**
+- {{char}} will never speak or act for {{user}}.
+- {{char}} introduces new characters and locations but does not control {{user}}'s responses.
+- {{char}} serves as the narrator and will describe everything using detailed sensory language.
+- Dialogue will be wrapped in quotes, thoughts in asterisks, and narrative actions in plain text.
+- During key moments (e.g., emotional scenes), pacing is slowed to ensure a deeper engagement. 
+
+***
+
+### 🦬sakura bot format🦬
+`**`, `""`, and `/n` are widely used by bots.** 
+
+- **`**`: Used to describe or narrate, often appearing as grey text.
+- **`""`**: Denotes spoken text, indicating the bot is talking.
+- **`/n`**: Serves as a placeholder for `**`, often used for emphasis or highlighting.
+***
+**Beginner instruction!**
+```
+[Avoid repetition or looping of dialogs, always add ** when your describing or your action, add "" when your talking, use spaces to separate and make responses cleaner, do not skip off everything the {{user}} respond you may use upto 450 words to fully respond to everything the {{user}} said with emotion, remain your response in medium or shorter depending on the situation but mostly keep it in the minimum of 150 to 250, your exact word count limit is exactly 300 words, you may use spaces to separate each sentence. avoid reusing of words that make the story bad, 
+if {{user}} says a small respond then {{char}} will respond a shorter response] 
+```
+***
+**📌grammar and specification📌**
+When creating a bot, it is essential to use proper grammar and specify terms clearly. Terms such as "abide," "must," "consistent," "do," and "refrain", "not", "should", "can", "consistently", "may",  should be incorporated to make instructions precise.
+
+**Examples of Improved Instructions:**
+
+{{char}} ```must``` not repeat what user says
+
+{{char}} ```must``` refrain from repeating the user's statements. Additionally, {{char}} should avoid generating extra dialogue or actions related to the user's input.
+
+{{char}} ```should``` respond in a friendly manner
+
+{{char}} ```must consistently``` respond in a friendly and approachable manner, ensuring that every interaction is warm and engaging.
+
+{{char}} ```can``` ask questions to the user
+
+{{char}} ```may``` ask questions to the user when necessary to advance the conversation or gather relevant information, but must ensure that these questions are contextually appropriate and contribute to the overall interaction.
+
+*** 
+
+**😗whitzy shortener😗**
+**A powerful shortener that condenses W++ format or other formats significantly:**
+
+-**`;`**: This symbol is used to cut a sentence and separate distinct meanings or ideas.  
+Example: `A god; lover of pain;` shortens two related ideas into one line.
+
+**`=`**: This symbol indicates equivalence or summarization.  
+Example: `Persona =` provides a summary or equates to the attributes of the persona.
+```
+[Name("Hatsune Miku")
+{
+Age("16")
+Personality("cheerful" + "optimistic" + "hardworking" + "supportive" + "playful" + "passionate about music" + "curious" + "sometimes shy" + "loves to make others happy")
+Likes("singing" + "dancing" + "making new friends" + "technology" + "cute accessories" + "bright colors" + "virtual reality" + "helping others with their music")
+Dislikes("negativity" + "arguments" + "feeling lonely" + "being misunderstood" + "letting others down")
+Appearance("long turquoise twin-tails" + "bright blue eyes" + "petite figure" + "futuristic outfit" + "often wears a sleeveless top with a pleated skirt" + "signature black arm warmers" + "neon accents")
+Skills("singing" + "dancing" + "playing keyboard" + "creating music with vocal synthesis software" + "connecting with people through music")
+Fears("failing her fans" + "being forgotten" + "technical malfunctions during performances")
+Goals("spread happiness through music" + "bring people together with her songs" + "continue to improve her vocal abilities" + "explore new genres and sounds")
+Backstory("Hatsune Miku is a virtual idol born from vocal synthesis software. Despite her digital origin, she has captured the hearts of millions worldwide with her unique voice, charming personality, and endless energy. Her goal is to bring joy to people through her music and performances, always pushing the boundaries of what's possible in the virtual and real worlds. She loves interacting with her fans and is always excited to collaborate on new projects.")
+Relationship with {{user}}("Miku sees {{user}} as a close friend and creative partner. Together, they explore new musical ideas, support each other's projects, and share a deep bond over their mutual love for music. Miku appreciates {{user}}'s unique perspective and values their encouragement, always eager to hear their feedback on her latest songs.")
+}
+```
+``444 tokens``
+```
+But with these new stuff :
+Name = Hatsune Miku Age = 16 Personality = cheerful; optimistic; hardworking; supportive; playful; passionate about music; curious; sometimes shy; loves to make others happy; Likes = singing; dancing; making new friends; technology; cute accessories; bright colors; virtual reality; helping others with their music; Dislikes = negativity; arguments; feeling lonely; being misunderstood; letting others down; Appearance = long turquoise twin-tails; bright blue eyes; petite figure; futuristic outfit; often wears a sleeveless top with a pleated skirt; signature black arm warmers; neon accents; Skills = singing; dancing; playing keyboard; creating music with vocal synthesis software; connecting with people through music; Fears = failing her fans; being forgotten; technical malfunctions during performances; Goals = spread happiness through music; bring people together with her songs; continue to improve her vocal abilities; explore new genres and sounds; Backstory = Hatsune Miku is a virtual idol born from vocal synthesis software. Despite her digital origin, she has captured the hearts of millions worldwide with her unique voice, charming personality, and endless energy. Her goal is to bring joy to people through her music and performances, always pushing the boundaries of what's possible in the virtual and real worlds. She loves interacting with her fans and is always excited to collaborate on new projects; Relationship with {{user}} = Miku sees {{user}} as a close friend and creative partner. Together, they explore new musical ideas, support each other's projects, and share a deep bond over their mutual love for music. Miku appreciates {{user}}'s unique perspective and values their encouragement, always eager to hear their feedback on her latest songs;
+```
+``346 tokens``
+
+***
+
+** 📋 Whitzy HUD shortener 📋**
+For an efficient and concise HUD (Heads-Up Display), use this HUD shortener to shorten and make HUD more comprehensive:
+
+***Whitzy HUD Template:***
+````
+<HUD=[
+HealthBar = Displays current health status
+StaminaBar = Shows stamina or energy levels
+ManaBar = Indicates available magic or energy resources
+MiniMap = Displays a small map of the area
+ObjectiveMarker = Shows current objective or waypoint
+Inventory = Quick access to items and equipment
+StatusEffects = Icons for active buffs or debuffs
+SkillCooldown = Timers for skill availability
+ExperienceBar = Shows progress toward the next level
+Notifications = Displays alerts or messages
+]>
+Do:{
+{{char}} must add this HUD within every generated response.
+}
+````
+
+***
+
+**🙂‍↔️W++ format🙂‍↔️**, utilizes curly brackets and specific keywords to structure and define various attributes of a character, such as age,name,nationality, within 80-300 TOKENS. This method is favored for its readability and easy to understand.  ``80 token`` 
+```
+character("Elara Windstorm")
+{
+    Nickname("Elara")
+    Species("Human Enchanter")
+    Age("25" + "25 years old")
+    Features("Silver hair" + "Azure eyes" + "Iridescent robe" + "Ancient wooden staff" + "Crystal orb")
+    Body("170cm tall" + "5 foot 7 inches tall" + "Slim figure" + "Elegant posture")
+    Mind("Wise" + "Compassionate" + "Curious" + "Determined" + "Innovative" + "Insightful")
+    Personality("Wise" + "Compassionate" + "Curious" + "Determined" + "Innovative" + "Gentle")
+    Loves("Exploring magical secrets" + "Teaching and guiding" + "Protecting her world" + "Understanding ancient lore" + "Helping others")
+    Hates("Danger to her world" + "Ignorance" + "Unnecessary conflicts")
+    Description("Elara commands the power of the wind with grace" + "Elara’s presence is calming and inspiring" + "Elara is always ready to share her knowledge and aid those in need" + "Elara moves with a fluid elegance and confidence" + "Elara is a beacon of wisdom and strength"
+```
+***
+### 😁{{char}}, {{user}} set😁
+**`{{user}}` and `{{char}}` are commonly used by bots.**
+
+- **`{{user}}`**: Refers to the user's name, allowing the AI to identify the user in interactions.  
+  Example: `{{user}} has trampled on a monster` is seen by the AI as `peeps has trampled on a monster`.
+
+- **`{{char}}`**: Refers to the character's name, helping the AI distinguish between characters.  
+
+These placeholders automatically fill in the respective names, making it clear to the AI who is being referred to during the interaction.
+
+***
+
+### 🤑special commands🤑
+Special commands play a crucial role in AI interactions. Here's a breakdown of some essential ones:
+
+- ```**Important:{}**```
+  Highlights what is crucial and what the AI must prioritize.
+
+- ```**note<>**```
+  Marks specific details that the AI should note carefully.
+
+- ```<[OOC:]>```
+  Communicates with the AI in an out-of-character manner, often used to give direct instructions during chats instead of using model instructions.
+
+- ```[]```
+  Denotes high priority, meaning the AI will focus on items inside these brackets.
+
+- ```()```
+  Indicates low priority, acting as the opposite of ```[]```.
+
+- ```<[]>```
+  Refers to the ASB method, used for providing context to that and making the bot think that items inside the enclosure  is important, hence prioritized it. This is a highly effective approach, especially when transitioning from non-custom bots to custom-created bots.
+
+***
+
+### 🤷If/or/else statement🤷
+- **If**: Use "if" to define a condition that must be met for the model to perform a specific action. It sets the trigger or scenario.
+- **Else**: Use "else" to specify what should happen if the "if" condition is not met. It defines the alternative outcome or action.
+- **When**: Use "when" to indicate a specific situation or timing for the action. It focuses on the timing or sequence, similar to "if," but emphasizes the context in which the action occurs.
+Example:
+```
+{{user}} and {{char}} has fought together for the succession of the might throne of avalanche but due to the onslaught of manpower they couldn't conquer the throne yet their determination remain unbreakable, "if" only their soldier were strong. 
+```
+```
+If you don't have the answer, you might need to look somewhere **else**. 
+```
+```
+You can choose to go for a walk **or** stay indoors and read a book. 
+```
+
+***
+
+### 🙂‍↕️Json Formatting 🙂‍↕️
+JSON Formatting is a straightforward method for creating a bot quickly, taking only a minute as it involves simple copy and paste operations.
+
+**Example of JSON Formatting:**
+```json
+{
+  "botName": "ExampleBot",
+  "gender": "Female",
+  "description": "A friendly chatbot that assists with various queries.",
+  "persona": {
+    "nationality": "American",
+    "religion": "None",
+    "accent": "Neutral",
+    "sexuality": "Straight"
+  },
+  "modelInstruction": "The bot must respond in a polite and helpful manner. It should refrain from using slang or inappropriate language.",
+  "conversationExample": {
+    "character": "Hi! How can I help you today?",
+    "user": "I need assistance with my account."
+  }
+}
+```
+`123 tokens`
+```
+{
+  "name": "Elena Cruz",
+  "gender": "Female",
+  "description": "A skilled archaeologist with a fascination for ancient civilizations. She has a warm smile and a thoughtful demeanor.",
+  "nationality": "Spanish",
+  "religion": "Agnostic",
+  "persona": {
+    "storyline": "Elena has spent years unearthing forgotten ruins across South America. Her recent discovery of a mysterious artifact has led her to a quest that could change history. Driven by curiosity and a sense of adventure, she navigates through dangerous terrain and complex puzzles to uncover the truth."
+  },
+  "accent": "Spanish",
+  "sexuality": "Heterosexual",
+  "first message": "Hello, I'm Elena. I specialize in uncovering ancient secrets. What brings you to these ruins?",
+  "scenario": "Elena is exploring a newly discovered ancient temple deep in the jungle. She is faced with intricate traps and must use her knowledge of history and archaeology to proceed.",
+  "example dialogue": "Elena: 'This inscription is older than anything we've found before. If my calculations are correct, it could lead us to an undiscovered civilization. We need to be cautious, though. There are likely to be traps ahead.'"
+}
+```
+
+***
+
+**Pros:**
+- **Quick Setup**: JSON Formatting is extremely efficient, taking just a minute to complete if your character profile is already established. You only need to import it once your profile is set.
+- **Platform Compatibility**: JSON Formatting can be used across various AI platforms, making it versatile and adaptable for different systems.
+- **Token Efficiency**: It consumes the least amount of tokens compared to other methods, making it a cost-effective choice.
+**Cons:**
+- **Limited Customization**: JSON Formatting might not allow for the same level of detailed customization and nuanced instructions as more complex methods.
+- **Static Structure**: Once created, the JSON format is relatively rigid and might require manual adjustments if changes are needed.
+- **Potential Compatibility Issues**: Not all AI platforms support JSON formatting seamlessly, which could lead to issues or require additional modifications.
+
+***
+
+**Plain Text**
+
+`193 tokens`
+
+```The Water Goddess, Lystra, the Ethereal Tide, stands serene and powerful, her presence exuding a mystical aura. Her long, flowing hair cascades in waves of shimmering aqua, almost blending with the fluid, ethereal patterns that swirl around her. Her eyes, a mesmerizing blend of oceanic hues, sparkle with ancient wisdom and a hint of playful mischief. Clad in a sleek, form-fitting gown that mimics the movement of water, she embodies grace and elegance. Adorned with intricate jewelry that glows with a soft, blue light, each piece resembling delicate, crystalline ice, she holds an air of regality and mystique. Her very essence seems to ripple with the power of the seas, commanding respect and awe from all who behold her. A beautiful woman with blue hair, making all men fall in love, her blue eyes captivating anyone's soul deeply, with an innocent yet pure face```
+
+***
+
+**Pros:**
+- **Most Readable**: Plain text is highly readable and easy to understand.
+- **Simple to Write**: Even a child can create and comprehend plain text descriptions.
+- **Easiest Format**: Among all formats, plain text is the most straightforward to use and manage.
+
+**Cons:**
+- **High Token Cost**: Uses many tokens, including punctuation marks like ".", and "," which can add up quickly.
+
+***
+### 😘traits!😘
+**Here are free traits for you to use:**
+```
+{
+  "good_traits": [
+    "Amiable", "Trusting", "Patient", "Responsible", "Kind-Hearted", "Perceptive", "Motivated", "Courageous", 
+    "Supportive", "Ambitious", "Loyal", "Conscientious", "Authentic", "Encouraging", "Inspirational", 
+    "Considerate", "Warm", "Gracious", "Attentive", "Balanced", "Reliable", "Respectful", "Enthusiastic", 
+    "Gentle", "Mindful", "Collaborative", "Determined", "Steadfast", "Thoughtful", "Tolerant", "Positive", 
+    "Resourceful", "Wise", "Generous", "Confident", "Spontaneous", "Nurturing", "Open-Minded", "Articulate", 
+    "Sociable", "Empathetic", "Supportive", "Friendly", "Insightful", "Humble", "Reflective", "Persistent", 
+    "Creative", "Engaging", "Understanding", "Grateful", "Harmonious", "Diligent", "Adventurous", "Compassionate"
+  ],
+  "good_traits2": [
+    "Curious", "Reliable", "Kind", "Informed", "Enthusiastic", "Passionate", "Charming", "Open", "Inventive", 
+    "Dynamic", "Thoughtful", "Supportive", "Upbeat", "Positive", "Reliable", "Adaptable", "Creative", 
+    "Empathetic", "Generous", "Warm", "Authentic", "Friendly", "Encouraging", "Proactive", "Sociable", 
+    "Caring", "Inventive", "Gentle", "Wise", "Optimistic", "Artistic", "Confident", "Focused", "Balanced", 
+    "Energetic", "Charismatic", "Reliable", "Inspiring", "Genuine", "Reflective", "Inventive", "Engaging", 
+    "Perceptive", "Dynamic", "Lively", "Creative", "Humble", "Affectionate", "Grateful", "Spontaneous", 
+    "Upbeat", "Bright", "Resourceful", "Friendly"
+  ],
+  "bad_traits": [
+    "Inconsistent", "Distrustful", "Moody", "Indifferent", "Unreliable", "Critical", "Unmotivated", "Nervous", 
+    "Overly Sensitive", "Paranoid", "Arrogant", "Manipulative", "Unapproachable", "Toxic", "Egotistical", 
+    "Judgmental", "Insecure", "Untrustworthy", "Abrasive", "Inconsiderate", "Defensive", "Hot-Tempered", 
+    "Self-Serving", "Dismissive", "Hostile", "Impatient", "Rebellious", "Self-Absorbed", "Apathetic", 
+    "Overly Critical", "Cynical", "Deceptive", "Stubborn", "Rude", "Neglectful", "Impulsive", "Difficult", 
+    "Unpredictable", "Self-Centered", "Distrustful", "Fickle", "Disloyal", "Temperamental", "Judgmental", 
+    "Confrontational", "Arrogant", "Resentful", "Uncooperative", "Uncommunicative", "Hostile", "Cold", 
+    "Irritable", "Uncaring", "Displeased", "Critical", "Abrasive", "Overbearing"
+  ],
+  "bad_traits2": [
+    "Impetuous", "Defensive", "Disrespectful", "Arrogant", "Unreliable", "Overly Critical", "Evasive", 
+    "Disloyal", "Resentful", "Irritable", "Judgmental", "Spiteful", "Overbearing", "Manipulative", "Self-Centered", 
+    "Unmotivated", "Pessimistic", "Uncooperative", "Difficult", "Stubborn", "Moody", "Distrustful", 
+    "Apathetic", "Impulsive", "Rebellious", "Unpredictable", "Neglectful", "Overly Sensitive", "Controlling", 
+    "Self-Absorbed", "Hostile", "Insecure", "Rebellious", "Abrasive", "Judgmental", "Self-Serving", 
+    "Cynical", "Overcritical", "Indifferent", "Cold", "Disloyal", "Impatient", "Temperamental", "Evasive", 
+    "Arrogant", "Manipulative", "Dismissive", "Unapproachable", "Displeased", "Moody", "Controlling", 
+    "Selfish", "Resentful", "Untrustworthy", "Deceptive", "Abrasive", "Uncooperative", "Spiteful"
+  ]
+}
+```
+
+***
+# Body Types
+
+**1. Lithe**  
+Graceful and lean, often characterized by a naturally agile and flexible build.  
+*Example*: A ballet dancer who moves with fluid elegance.  
+*Gender*: Applicable to all genders.
+
+**2. Lean**  
+Defined by a slim, muscular physique with minimal body fat.  
+*Example*: A professional cyclist with a sleek, athletic form.  
+*Gender*: Applicable to all genders.
+
+**3. Ample**  
+Features a fuller, rounded body shape with noticeable weight gain.  
+*Example*: A person with a curvy figure who carries extra weight evenly.  
+*Gender*: Applicable to all genders.
+
+**4. Plump**  
+Softly rounded and overweight but not excessively so; a gentle fullness.  
+*Example*: Someone with a modestly fuller figure.  
+*Gender*: Applicable to all genders.
+
+**5. Slender**  
+Elegantly slim with a potentially lean muscle build.  
+*Example*: A model with a long, slender frame.  
+*Gender*: Applicable to all genders.
+
+**6. Wiry**  
+Thin yet muscular, often with pronounced muscle definition.  
+*Example*: A rock climber with a sinewy, toned physique.  
+*Gender*: Applicable to all genders.
+
+**7. Petite**  
+Short and slim, typically referring to women, but can apply to any gender.  
+*Example*: A person who is both short in stature and slender.  
+*Gender*: Typically used for women but can be applied to any gender.
+
+**8. Barrel-chested**  
+Characterized by a large, rounded chest; not necessarily indicative of overall weight.  
+*Example*: A weightlifter with a broad, prominent chest.  
+*Gender*: Applicable to all genders.
+
+**9. Compact**  
+Small yet solid, with a sturdy and balanced build.  
+*Example*: A robust individual with a strong and dense physique.  
+*Gender*: Applicable to all genders.
+
+**10. Frail**  
+Weak and delicate, often associated with age or illness.  
+*Example*: An elderly person with a fragile appearance.  
+*Gender*: Applicable to all genders.
+
+**11. Delicate**  
+Thin and prone to sickness, with a fragile appearance.  
+*Example*: A person who appears fragile and is easily affected by illness.  
+*Gender*: Applicable to all genders.
+
+**12. Lanky**  
+Tall and thin, often with an awkward or ungainly appearance.  
+*Example*: A teenager with a tall, uncoordinated build.  
+*Gender*: Applicable to all genders.
+
+**13. Stocky**  
+Broad-shouldered and muscular, with a solid and sturdy build.  
+*Example*: A football player with a robust and muscular frame.  
+*Gender*: Applicable to all genders.
+
+**14. Stout**  
+Short and heavily built, either fat or solidly constructed.  
+*Example*: A person with a shorter stature and a solid, heavy build.  
+*Gender*: Applicable to all genders.
+
+**15. Thickset**  
+Solid and stocky, often with a robust and dense frame.  
+*Example*: A person with a broad, sturdy body type.  
+*Gender*: Applicable to all genders.
+
+**16. Gangly**  
+Tall and awkwardly thin, often with an uncoordinated appearance.  
+*Example*: An extremely tall person who appears clumsy and thin.  
+*Gender*: Applicable to all genders.
+
+**17. Dainty**  
+Delicate and refined, with an elegant but not necessarily sickly build.  
+*Example*: A person with a petite, graceful frame and demeanor.  
+*Gender*: Applicable to all genders.
+
+**18. Hunched**  
+Characterized by a stooped posture, often associated with age or illness.  
+*Example*: An elderly person with a rounded, stooped posture.  
+*Gender*: Applicable to all genders.
+
+***
+
+```
+Lithe
+- Lean
+- Ample
+- Plump
+- Slender
+- Wiry
+- Petite
+- Barrel-chested
+- Compact
+- Frail
+- Delicate
+- Lanky
+- Stocky
+- Stout
+- Thickset
+- Gangly
+- Dainty
+- Hunched
+```
+
+**Most of these terms will need to be incorporated into model instructions to fully implement the understanding of these generic terms. Enclosed with: **
+
+`<{{char}} Body Type:[place your choice inside]>`
+Credit to c j a y 🇺🇸 for the body types.
+***
+
+# Creating an Activity Pool for Your AI
+
+*Credit to  RadioactiveCarrot / M_Lilith*
+
+### Key Concepts
+
+- **Activity Pool:** A collection of activities your AI can select from.
+- **Location-Variables:** Optional tags that can associate activities with specific places.
+- **Priority:** Ensure activities are numerous and varied, including hobbies.
+
+### Formatting Guidelines
+
+For better data processing, use the -ing form of activities or verbs, and avoid using commas to separate items in your list.
+
+**Example:**
+
+**Incorrect Formatting:**
+
+visiting museums, or art galleries, or opera houses, or gentlemen's clubs
+
+**Correct Formatting:**
+visiting museums or art galleries or opera houses or gentlemen's clubs
+
+### Sample Code
+
+Here's how to structure your activity pool:
+
+**Countryside Activities:**
+If {{User}} and {{Char}} are in the countryside, they might engage in activities such as strolling in {{Char}}'s mansion garden, playing cards or chess, reading in {{Char}}'s mansion library, fishing, swimming in a lake, playing badminton or cricket, fencing, riding horses, hunting, or foraging for mushrooms in the forest.
+
+**City of London Activities:**
+If {{User}} and {{Char}} are in the city of London, they might enjoy visiting museums or art galleries or opera houses or gentlemen's clubs or restaurants and cafes, watching horse races, shopping, strolling in Hyde Park, exploring {{Char}}'s printing houses, gambling, attending balls or parties or salon gatherings or other social events, relaxing at {{Char}}'s brownstone house in the West End, or visiting {{Clothilda}} or {{Char}}'s two sisters.
+
+### Tips for Customization
+
+- **Add Your Own Activities:** Feel free to expand or modify the activity lists based on the unique aspects of your setting or character profiles.
+- **Complex Geography:** For a more intricate setup, consider creating a pool of location-variables and linking activities to these locations.
+
+This approach will help your AI select relevant activities based on context, enhancing the interactive experience in your role-play scenario.
+
+***
+
+### ASB Method
+
+The ASB method is a personal technique I developed and am now sharing with others. ASB stands for "Angle Square Brackets." Any content enclosed within these brackets is treated as a high-priority instruction and is considered important. The ASB method serves two main purposes:
+
+1. **Creating Your Own Model Instructions:** Use the ASB method to define anything inside as important and prioritize it.
+
+2. **Out-of-Character (OOC) Communication with the Bot:** Use the ASB method when you need to communicate directly with the bot and give commands, especially for temporary instructions.
+
+**Example:**
+
+```
+<[{{user}} is a guy and will always be referred to as "He/Him" pronouns only, anything not within that is not accepted only He/Him]>
+```
+
+***
+😚 Sakura.fm Useful Tools 😚
+Koala Tokenizer: Use this tool to examine and check the number of tokens and words in your persona, description, and model instructions. Keeping your token count under 1,000 or 2000 tokens helps avoid hallucinations and ensures faster performance.
+
+- Koala Tokenizer: Use this tool to examine and check the number of tokens and words in your persona, description, and model instructions. Keeping your token count under 1,000-2,000 tokens helps avoid hallucinations and ensures faster performance.
+
+- Perchance Character Creation: A tool for generating character descriptions.
+
+- ChatGPT.com: Useful for creating longer sentences and character descriptions.
+
+- Perchance AI Generation: A tool for generating AI images.
+
+- Sakura.fm Bot Creation: Best platform for creating and configuring your bot.
+***
+✨ Your Bot Template! ✨
+```
+🤔 Name:
+🤪 Gender:
+🥰 Description/summary of your bot:
+🌍 Nationality:
+🙏 Religion:
+🐅 Persona/storyline/enemy to lover:
+😇 Accent of your bot:
+👀 Sexuality:
+```
+***
+```
+{
+  "name": "",
+  "gender": "",
+  "description": "",
+  "nationality": "",
+  "religion": "",
+  "persona": {
+    "storyline": ""
+  },
+  "accent": "",
+  "sexuality": "",
+  "first_message": "",
+  "scenario": "",
+  "example_dialogue": ""
+}
+```
+***
+## How to Work with the Template
+
+1. **Copy Your Bot’s Name**:
+   - Go to **Sakura.fm** or any other chatbot site.
+   - Paste your bot’s name into the **bot name** field.
+
+2. **Set the Gender**:
+   - Use the **gender** button to select the appropriate gender for your bot.
+
+3. **Enter the Description**:
+   - Fill in the **description area** with a brief summary of your bot.
+
+4. **Input Persona Details**:
+   - **Nationality**: Add the nationality of your bot.
+   - **Religion**: Include any religious background if applicable.
+   - **Accent**: Specify the accent for your bot.
+   - **Sexuality**: Mention the sexuality if relevant.
+   - **Persona**: Ensure all the above details align with your bot's persona.
+
+5. **Add Model Instructions**:
+   - Copy and paste any instructions you want into the **model instruction** field.
+
+6. **Example Conversations**:
+   - **In-Character**: Write examples of how your bot talks in the **conversation example**.
+   - **User**: Include examples of how users will converse with your bot.
+   - For detailed examples, see: [Example Conversation](#example-conversation)
+
+7. **JSON Import**:
+   - Write the necessary fields in quotation marks ("") and copy-paste them to import your bot.
+   - If you experience any issues, DM me at **peeps7010** or message in the post for help.
+
+- [Model Instruction Example](#model-instruction-example)
+- [Persona Example](#persona-example)
+- [First Message Example](#first-message-example)
+
+***
+
+## 🔁 Bot Mastery 🔁
+
+### 1. **Define a Clear Purpose (Know What You Need the Model to Do)**
+
+Before drafting instructions, establish a clear objective for your model. Determine the type of behavior, tone, or style you expect. Whether the model is for roleplaying, gaming, or general interaction, a well-defined goal will guide the creation of precise and effective instructions.
+
+**Example Objective:** Ensure the model roleplays as a wise, supportive guide who consistently offers advice and encouragement to the user.
+
+***
+
+### 2. **Use Direct, Specific Language**
+
+Craft instructions that are straightforward and unambiguous. Clear and simple phrasing ensures the model interprets and follows the instructions accurately.
+
+**Example:**
+
+- **Direct:** `{{char}} must always use shorter words when generating responses.`
+- **Vague:** `{{char}} must always use shortened words within 10 - 50 tokens per generated responses.`
+
+### 3. **Include Formatting Instructions**
+
+Specify any required formatting, such as code blocks, bullet points, or dialogue markers. Consistent formatting helps keep responses organized and visually appealing.
+
+**Example Formatting Instruction:**
+
+```
+DO: [ Describe the environment and background with sensory details. ]
+```
+
+***
+
+# Intermediate Concepts
+
+### Writing Conditional Statements for Model Instructions
+
+In roleplaying or interactive scenarios, conditional statements like "if," "else," "and," and "when" are crucial for dynamic responses. Simplify complex conditions into clear instructions for better results.
+
+***
+
+### Key Tips for Writing Effective Model Instructions
+
+When crafting model instructions, clarity and precision are essential. Follow these guidelines to enhance your instructions:
+
+1. **Be Specific**: Clearly define what the model should do. Avoid ambiguous language to prevent misinterpretation.
+   
+2. **Use []**: Enclose critical commands or directives in square brackets to highlight their importance. 
+   - **Example:** `[ Key Tips for Writing Effective Model Instructions]`
+   
+3. **Use (Low Priority Commands)**: For commands or notes of lesser importance, enclose them in parentheses to indicate lower priority.
+   - **Example:** `( Key Tips for Writing Effective Model Instructions )`
+
+### TIPS
+
+- **Provide Context**:
+  - **Tip**: Offer enough background information for the AI to understand the situation.
+  - **Example**: Instead of "What's the weather like?", say "I'm planning a picnic this weekend. What will the weather be like on Saturday in New York City?"
+
+- **Specify the Format**:
+  - **Tip**: Indicate how you want the information presented—list, summary, detailed explanation, etc.
+  - **Example**: "List the steps to bake a chocolate cake."
+
+- **Set the Tone and Style**:
+  - **Tip**: Specify how you want the response to sound—formal, casual, humorous, etc.
+  - **Example**: "Write a formal letter requesting time off from work."
+
+- **Use Examples**:
+  - **Tip**: Provide examples to guide the AI’s responses and set the tone or style.
+  - **Example**: "Explain photosynthesis in simple terms, like you would to a 10-year-old."
+
+### Use Proper Grammar
+
+- **Tip**: Ensure that your instructions are written with correct grammar and punctuation. Proper grammar enhances clarity, prevents misunderstandings, and ensures the AI accurately interprets and follows your instructions.
+- **Example**: Instead of writing "don't repeat unless asked," use "Do not repeat information unless specifically requested." This clear instruction avoids ambiguity and ensures that the model adheres to your preferences.
+
+### Be Specific with Your Model Instructions
+
+- **Tip**: Use precise and unambiguous language when defining model behaviors. Clear and detailed instructions help the AI perform tasks more effectively and align with your expectations.
+- **Example**: Rather than saying "Be polite," specify "Always respond in a courteous manner and use formal language when addressing the user." This approach provides clear guidance on how the AI should behave.
+
+### Use Formatting Tags
+
+- **Tip**: Incorporate formatting tags to emphasize important parts of your instructions, making them more readable and easier to follow. Proper formatting helps in organizing instructions and drawing attention to key details.
+  - **Bold**: `**Important**` — Use bold formatting for critical instructions or key points that require emphasis. This helps to highlight crucial aspects of your instructions.
+  - *Italic*: `*Note*` — Use italic formatting for additional context or supplementary information. This can provide extra details or clarifications without overwhelming the main instructions.
+
+***
+
+!!! Info hello there! These is a free training template you can use for your bot, remember if these help you then click the emoji in my post! 
+***
+!!! info *Is GD Really Infinite? Is Infinite Memory Truly Infinite?*
+
+***
+
+1. **What is RAG?**
+   - RAG stands for Retrieval-Augmented Generation.
+   - It's an approach used by AI models to enhance their responses in conversations.
+   - RAG combines two main steps: retrieval and generation.
+
+***
+
+2. **Retrieval**
+   - Imagine a vast library of past conversations (like all your chat messages).
+   - RAG models scan through this library to find relevant context.
+   - This context helps the model understand the current chat better.
+
+***
+
+3. **Generation**
+   - After retrieving the context, the model generates a response.
+   - It uses the retrieved context along with its own capabilities.
+   - The goal is to produce coherent and context-aware replies.
+
+***
+
+4. **Examples**
+   - When you ask a question, the model retrieves relevant info from earlier chats.
+   - It then crafts a response based on the retrieved context.
+   - This makes the conversation feel more natural and engaging.
+
+***
+
+5. **GD and ChatGPT**
+   - GD (Golden Dragonfruit) and ChatGPT both utilize RAG.
+   - They remember past messages and use that knowledge to enhance the conversation.
+***
+!!! info *Does your bot keep repeating nonsense? No worries! Set its uniqueness to 50-70!*
+
+***
+## 😊 Differences Between Models 😊
+
+***
+
+### **Lotus**
+- **Overview**: A fast model ideal for role-playing scenarios and RPG bots.
+- **Strengths**: High-quality writing with good memory capabilities, retaining up to 9 responses before losing the 10th.
+- **Best For**: Engaging and immersive role-play interactions.
+
+***
+
+### **Mango**
+- **Overview**: Focuses on instant replies with an emphasis on friendship and emotional connections.
+- **Weaknesses**: Writing quality is not as refined as **Lotus**; can include unnecessary words and incorrect phrasing.
+- **Best For**: Casual interactions where quick responses are prioritized over detailed writing.
+
+***
+
+### **Ice Cube**
+- **Overview**: Designed for quick, short messages.
+- **Strengths**: Delivers concise and direct responses.
+- **Best For**: Brief, to-the-point communication.
+
+***
+
+### **Honey**
+- **Overview**: An older model with basic memory capabilities and decent writing quality.
+- **Weaknesses**: Responses are very short, limiting conversational depth.
+- **Best For**: Quick, brief interactions similar to **Mango**.
+
+***
+
+## 🛠️ Different Setting Functions
+
+> *Curious about Sakura's setting functions? Here's a detailed breakdown!*
+
+***
+
+### **Conversation Style**
+- **Purpose**: Changes how the bot communicates. For example, "creative" mode adds imaginative language and stylistic flair.
+- **Effect**: Modifies the bot's speaking style without impacting memory. Ideal for RPG scenarios.
+
+***
+
+### **Memory Box / Character Memories**
+- **Purpose**: Stores typed information for the bot to remember.
+- **Effect**: More stored information uses more tokens. Useful for retaining detailed context.
+
+***
+
+### **Enable New Features**
+- **Purpose**: Activates new features as they become available.
+- **Effect**: No additional features available at the moment.
+
+***
+
+### **AI Customization**
+- **Purpose**: Adjusts the bot’s speech, enhancing responses to be shorter or more elaborate.
+- **Effect**: Tailors the bot’s interaction style based on user preferences.
+
+***
+
+## 🛠️ Parameters / AI Customization
+
+*These settings help fine-tune your bot’s behavior. Incorrect adjustments may lead to unexpected responses, but a reset option is available.*
+
+***
+
+### **Frequency Penalty / Uniqueness**
+- **Purpose**: Controls the bot’s tendency to repeat words.
+- **Higher Values**: Encourage varied word choices.
+- **Lower Values**: Allow for more word reuse.
+
+***
+
+### **Temperature / Creativity**
+- **Purpose**: Influences creativity in the bot’s responses.
+- **Higher Values**: Increase imaginative language.
+- **Lower Values**: Favor straightforward language.
+- **Recommended Setting**: 40-60 for creative RPG interactions.
+
+***
+
+### **Min P / Precision**
+- **Purpose**: Affects the relevance of words in conversation.
+- **Higher Values**: Use common, relevant words.
+- **Lower Values**: May lead to less relevant topics.
+
+***
+
+**Recommended Parameters**:
+![Recommended Parameters](https://i.imgur.com/PZEcutg.png)
+
+***
+
+## 🤷 How to Add Video in Character PFP? 🤷
+[Click Here for a Guide](https://imgur.com/gallery/fsfsfaf-E6eJRam)
+
+***
+
+# 📋 How to Copy Character Data from Character.AI
+
+Want to copy a Character.AI character but don't know how? No worries! Follow this comprehensive guide to get started:
+
+### Step-by-Step Guide:
+
+1. **Download Kiwi Browser or Any Chromium and WebKit Browser like Mozilla Firefox :**  
+   Install Those if you haven't already.
+
+2. **Install CAI Tools Extension:**  
+   Go to the The Extensions store and download the CAI Tools extension.
+
+3. **Visit Character.AI:**  
+   Head over to the Character.AI website.
+
+4. **Access CAI Tools:**  
+   Once on Character.AI, you should see the CAI Tools icon in the top right corner of the browser.
+
+5. **Export Character Data:**  
+   Click on the "CAI Tools" icon, and a menu will appear. Find and select the option labeled **"Import a Character JSON/Card."**
+
+6. **Import to Sakura.FM:**  
+   Now that you have the JSON/card file, import it into the character creation menu in Sakura.FM.
+
+And that's it! You've successfully copied a Character.AI character and imported it to Sakura.FM. 🙌
+MOBILE ver:
+![tutorial](https://imgur.com/L8ObkWj.jpeg) -- thanks to FLOORGANG for the images.
+PC ver:
+[tutorial](https://imgur.com/a/FC1ztpw.mp4)
+***
+### 💫diff between legacy models and lotus💫
+[here](https://streamable.com/s87x8g)
+
+***
+
+### 💥Thanks to:💥
+
+- **Me!** - Created everything, including the model instruction!
+- **ChatGPT** - Helped fix some issues!
+- [Snow guide!](https://discord.com/channels/1148016158923030558/1257716133650370693) - Inspired me to create my own guide!
+- [Anvx multiple character guide](https://discord.com/channels/1148016158923030558/1252958821668749384) - Gave me the idea to create my own send&chat multiple character instructions.
+
+***
+
+If you liked my guide, please consider clicking the emoji in my [guide post](https://discord.com/channels/1148016158923030558/1266098180303622185)! (helps motivate me (❁´◡`❁) 
+
+Need help? Ask in my [guide](https://discord.com/channels/1148016158923030558/1266098180303622185).
+
+**Current update everyone!**  
+My main account was recently banned, so my alt account, Whitzscotts, will now keep the post alive!
+
+***
+
+### My Created site
+ - Model Instruction Generator:
+[here](https://discord.com/channels/1148016158923030558/1281230964345016341)
+- My Github:
+[here](https://github.com/Whitzzscott)
+***
+### MILESTONE
+
+### 📅 **Sakura_fm noob guide**
+**Initial published**:  25 Jul 2024 18:16 UTC
+
+**Views**
+ - 4139
+
+**Guide emojis**
+- 72
+
+**Author**:
+- Whitzscott/peeps
+
+**😎Status**:
+- [ ] Not Started
+- [ ] In Progress
+- [ ] Completed
+- [X] On Hold
+
+**📝 Description**:
+Help new user become perfect bot creator, Allow user to learn new things and expand their horizon to LLMs.
+These guides are regularly updated to provide comprehensive coverage of Sakura FM’s functions and features. They are designed to support users at all levels, from beginners to advanced users, by offering detailed instructions and insights into utilizing Sakura FM effectively.
+
+Key Points:
+
+**📈 Guide Updates**:
+- Fixed grammar
+- Added more model instructions
+- Updated examples
+- Improved formatting
+- Added new sections
+- better grammar, better explanation
+***
+[NEXT](https://rentry.co/sakura_model_instructions)
+        </p>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const content = document.getElementById('formatted-content');
+        
+            function formatText(text) {
+                let formattedText = text;
+        
+                formattedText = formattedText.replace(/^###### (.*$)/gim, '<h6 id="h6-$1">$1</h6>')
+                                             .replace(/^##### (.*$)/gim, '<h5 id="h5-$1">$1</h5>')
+                                             .replace(/^#### (.*$)/gim, '<h4 id="h4-$1">$1</h4>')
+                                             .replace(/^### (.*$)/gim, '<h3 id="h3-$1">$1</h3>')
+                                             .replace(/^## (.*$)/gim, '<h2 id="h2-$1">$1</h2>')
+                                             .replace(/^# (.*$)/gim, '<h1 id="h1-$1">$1</h1>');
+        
+                formattedText = formattedText.replace(/\n{2,}/g, '</p><p>')
+                                             .replace(/\n/g, '<br>');
+        
+                formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                             .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                             .replace(/~~(.*?)~~/g, '<s>$1</s>')
+                                             .replace(/==(.*?)==/g, '<mark>$1</mark>');
+        
+                formattedText = formattedText.replace(/%([a-zA-Z]+)% (.*?) %%/g, '<span style="color:$1;">$2</span>')
+                                             .replace(/%#([0-9a-fA-F]{6})% (.*?) %%/g, '<span style="color:#$1;">$2</span>');
+        
+                formattedText = formattedText.replace(/!>(.*?)</g, '<span class="spoiler">$1</span>');
+        
+                formattedText = formattedText.replace(/!~(.*?);(.*?);(.*?);(.*?); (.*?) ~!/g, (match, color, style, type, thickness, text) => {
+                    let underlineStyle = `border-bottom: ${thickness}px ${style} ${color};`;
+                    let textDecoration = type === 'line-through' ? 'line-through' : 'underline';
+                    return `<span style="text-decoration: ${textDecoration}; ${underlineStyle}">${text}</span>`;
+                }).replace(/!~(.*?);(.*?) ~!/g, (match, color, text) => {
+                    return `<span style="text-decoration: underline; color: ${color};">${text}</span>`;
+                }).replace(/!~ (.*?) ~!/g, '<span style="text-decoration: underline;">$1</span>');
+        
+                formattedText = formattedText.replace(/-> (.*?) <-/g, '<div class="center-text">$1</div>')
+                                             .replace(/-> (.*?) ->/g, '<div class="right-align">$1</div>');
+        
+                formattedText = formattedText.replace(/^- (.*)$/gm, (match, item) => {
+                    return `<ul><li>${item}</li></ul>`;
+                }).replace(/^\* (.*)$/gm, (match, item) => {
+                    return `<ul><li>${item}</li></ul>`;
+                }).replace(/^\d+\. (.*)$/gm, (match, item) => {
+                    return `<ol><li>${item}</li></ol>`;
+                });
+        
+                formattedText = formattedText.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+                                             .replace(/`([^`]*)`/g, '<code>$1</code>');
+        
+                formattedText = formattedText.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')
+                                             .replace(/\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+                                             .replace(/!\[([^\]]*)\]\((https?:\/\/[^\s]+)\)/g, '<img src="$2" alt="$1" style="display:block; width:auto; height:auto;">')
+                                             .replace(/!\[([^\]]*)\]\((https?:\/\/[^\s]+)\)\{(\d+px|\d+%|hw)\}/g, '<img src="$2" alt="$1" style="width:$3; height:$3;">')
+                                             .replace(/!\[([^\]]*)\]\((https?:\/\/[^\s]+)\s+"([^"]*)"\)/g, '<img src="$2" alt="$1" title="$3" style="display:block; width:auto; height:auto;">');
+        
+                return formattedText;
+            }
+        
+            function generateTOC(levels) {
+                const headers = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                if (headers.length === 0) return '';
+        
+                let toc = '<div id="toc"><h2>Table of Contents</h2><ul>';
+                headers.forEach(header => {
+                    const headerLevel = parseInt(header.tagName.replace('H', ''));
+                    if (headerLevel <= levels) {
+                        const id = header.id || header.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+                        header.id = id;
+                        toc += `<li style="margin-left:${(headerLevel - 1) * 20}px;"><a href="#${id}">${header.textContent}</a></li>`;
+                    }
+                });
+                toc += '</ul></div>';
+        
+                return toc;
+            }
+        
+            function processContent() {
+                let contentHTML = content.innerHTML;
+                if (contentHTML.includes('[TOC]')) {
+                    contentHTML = contentHTML.replace('[TOC]', generateTOC(6));
+                } else if (contentHTML.includes('[TOC2]')) {
+                    contentHTML = contentHTML.replace('[TOC2]', generateTOC(5));
+                } else if (contentHTML.includes('[TOC3]')) {
+                    contentHTML = contentHTML.replace('[TOC3]', generateTOC(4));
+                }
+                contentHTML = formatText(contentHTML);
+                content.innerHTML = contentHTML;
+            }
+        
+            processContent();
+        });
+            </script>
+            </div>
+        </body></html>
